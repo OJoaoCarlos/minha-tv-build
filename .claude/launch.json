@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "minha-tv",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["ferramentas/servir-local.js", "minha-tv", "8765"],
+      "port": 8765
+    }
+  ]
+}

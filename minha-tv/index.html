@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Minha TV</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- AVPlay draws the video on a hardware plane behind this element. -->
+<object id="av" type="application/avplayer"></object>
+<!-- HTML5 fallback, only used when testing in a desktop browser. -->
+<video id="h5video"></video>
+
+<div id="app">
+
+    <!-- First run: account setup -->
+    <div id="setup" class="hidden">
+        <div class="setup-box" id="setup-form">
+            <div class="setup-logo"><span class="logo-mark"></span>Minha TV</div>
+            <p class="setup-text">Entre com os dados do seu provedor IPTV. Você só faz isso uma vez.</p>
+
+            <div class="btn primary focusable" id="btn-pair">Configurar pelo computador ou celular</div>
+            <div class="setup-or">ou preencha aqui com o controle:</div>
+
+            <div class="field focusable" data-input="f-server">
+                <label>Servidor</label>
+                <input id="f-server" type="text" placeholder="ex.: http://servidor.com:8080" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field focusable" data-input="f-user">
+                <label>Usuário</label>
+                <input id="f-user" type="text" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field focusable" data-input="f-pass">
+                <label>Senha</label>
+                <input id="f-pass" type="password" autocomplete="off">
+            </div>
+            <div class="setup-or">ou cole o link M3U completo (get.php?username=…&amp;password=…)</div>
+            <div class="field focusable" data-input="f-link">
+                <label>Link M3U</label>
+                <input id="f-link" type="text" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div class="btn focusable" id="btn-login">Entrar</div>
+            <div id="setup-msg" class="setup-msg"></div>
+        </div>
+
+        <!-- Pairing: the computer sends the account, nothing typed on the TV -->
+        <div id="pair" class="setup-box hidden">
+            <div class="setup-logo"><span class="logo-mark"></span>Minha TV</div>
+            <p class="setup-text">No computador, abra o navegador em <b class="pair-url">http://localhost:8766</b>,
+                digite o código abaixo e cole o seu link.</p>
+            <div class="pair-code" id="pair-code"></div>
+            <div class="pair-status" id="pair-status"></div>
+            <div class="pair-hint" id="pair-hint"></div>
+            <div class="btn focusable" id="btn-pair-retry">Procurar de novo</div>
+            <div class="btn focusable" id="btn-pair-cancel">Voltar</div>
+        </div>
+    </div>
+
+    <!-- Main app -->
+    <div id="main" class="hidden">
+        <nav id="sidebar" data-group="side">
+            <div class="side-logo"><span class="logo-mark"></span>Minha TV</div>
+            <div class="side-item focusable" data-section="home">
+                <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/></svg><span>Início</span></div>
+            <div class="side-item focusable" data-section="live">
+                <svg viewBox="0 0 24 24"><path d="M2 6h20v13H2z M4 8v9h16V8z M7 21h10v1.5H7z M8.5 1.5l3.5 3.2 3.5-3.2 1 1.1L13.4 5.5h-2.8L7.5 2.6z" fill-rule="evenodd"/></svg><span>TV ao vivo</span></div>
+            <div class="side-item focusable" data-section="movies">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z M6 6v2h2V6z M6 11v2h2v-2z M6 16v2h2v-2z M16 6v2h2V6z M16 11v2h2v-2z M16 16v2h2v-2z" fill-rule="evenodd"/></svg><span>Filmes</span></div>
+            <div class="side-item focusable" data-section="series">
+                <svg viewBox="0 0 24 24"><path d="M6 3h12v2H6z M4 7h16v2H4z M2 11h20v10H2z M10 13.5v5l4.5-2.5z" fill-rule="evenodd"/></svg><span>Séries</span></div>
+            <div class="side-item focusable" data-section="search">
+                <svg viewBox="0 0 24 24"><path d="M10 3a7 7 0 015.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1110 3zm0 2a5 5 0 100 10 5 5 0 000-10z"/></svg><span>Buscar</span></div>
+            <div class="side-item focusable" data-section="favorites">
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg><span>Favoritos</span></div>
+            <div class="side-item focusable" data-section="settings">
+                <svg viewBox="0 0 24 24"><path d="M10.3 2h3.4l.5 2.6 1.8.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.8 2.6.5v3.4l-2.6.5-.8 1.8 1.5 2.2-2.4 2.4-2.2-1.5-1.8.8-.5 2.6h-3.4l-.5-2.6-1.8-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.8L2 13.7v-3.4l2.6-.5.8-1.8-1.5-2.2 2.4-2.4 2.2 1.5 1.8-.8zM12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" fill-rule="evenodd"/></svg><span>Ajustes</span></div>
+            <div class="side-clock" id="clock"></div>
+        </nav>
+
+        <section id="content">
+            <div id="scr-home" class="screen vscroll" data-group="home"></div>
+
+            <div id="scr-live" class="screen split">
+                <div class="col-cats vscroll" data-group="cats"></div>
+                <div class="col-items vscroll" data-group="items"></div>
+            </div>
+
+            <div id="scr-movies" class="screen split">
+                <div class="col-cats vscroll" data-group="cats"></div>
+                <div class="col-items vscroll" data-group="items"></div>
+            </div>
+
+            <div id="scr-series" class="screen split">
+                <div class="col-cats vscroll" data-group="cats"></div>
+                <div class="col-items vscroll" data-group="items"></div>
+            </div>
+
+            <div id="scr-detail" class="screen"></div>
+
+            <div id="scr-search" class="screen">
+                <div class="search-bar" data-group="searchbar">
+                    <div class="field search-field focusable" data-input="f-search">
+                        <svg viewBox="0 0 24 24"><path d="M10 3a7 7 0 015.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1110 3zm0 2a5 5 0 100 10 5 5 0 000-10z"/></svg>
+                        <input id="f-search" type="text" placeholder="Buscar canais, filmes e séries" autocomplete="off" spellcheck="false">
+                    </div>
+                </div>
+                <div class="search-results vscroll" data-group="results"></div>
+            </div>
+
+            <div id="scr-favorites" class="screen vscroll" data-group="favs"></div>
+            <div id="scr-settings" class="screen vscroll" data-group="settings"></div>
+        </section>
+    </div>
+
+    <!-- Player overlay -->
+    <div id="player-ui" class="hidden">
+        <div class="pl-top">
+            <div class="pl-title" id="pl-title"></div>
+            <div class="pl-sub" id="pl-sub"></div>
+        </div>
+        <div class="pl-center" id="pl-center"></div>
+        <div class="pl-bottom">
+            <div class="pl-live hidden" id="pl-live">AO VIVO</div>
+            <div class="pl-progress" id="pl-progress">
+                <span id="pl-pos">0:00</span>
+                <div class="pl-bar"><div class="pl-fill" id="pl-fill"></div><div class="pl-seek" id="pl-seek"></div></div>
+                <span id="pl-dur">0:00</span>
+            </div>
+            <div class="pl-hint" id="pl-hint"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+</div>
+
+<script src="js/compat.js"></script>
+<script src="js/util.js"></script>
+<script src="js/store.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/api.js"></script>
+<script src="js/player.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Tizen build output
+*.wgt
+.manifest.tmp
+.buildResult/
+.sign/
+
+# Signing material never goes to git
+*.p12
+*.pem
+profiles.xml
+
+# OS / editor
+.DS_Store
+Thumbs.db
+node_modules/

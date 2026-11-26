@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns:tizen="http://tizen.org/ns/widgets"
+        xmlns="http://www.w3.org/ns/widgets"
+        id="http://minhatv.local/app"
+        version="1.0.0"
+        viewmodes="maximized">
+    <tizen:application id="MinhaTVapp.MinhaTV" package="MinhaTVapp" required_version="3.0"/>
+    <content src="index.html"/>
+    <icon src="icon.png"/>
+    <name>Minha TV</name>
+    <description>Player IPTV (Xtream Codes) com TV ao vivo, filmes e series por categoria.</description>
+
+    <tizen:profile name="tv-samsung"/>
+
+    <access origin="*" subdomains="true"/>
+    <tizen:allow-navigation>*</tizen:allow-navigation>
+    <tizen:content-security-policy>default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; media-src * data: blob:; connect-src *;</tizen:content-security-policy>
+
+    <tizen:setting screen-orientation="landscape"
+                   context-menu="disable"
+                   background-support="disable"
+                   encryption="disable"
+                   install-location="auto"
+                   hwkey-event="enable"/>
+
+    <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
+
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+</widget>
